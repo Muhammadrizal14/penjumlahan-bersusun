@@ -71,188 +71,87 @@ const dataSoal = {
 };
 
 
+
 /* =====================================================
    AUDIO
 ===================================================== */
 
-const backgroundMusic =
-    document.getElementById(
-        "backgroundMusic"
-    );
+const backgroundMusic = document.getElementById("backgroundMusic");
+const suaraBenarAudio = document.getElementById("suaraBenar");
+const suaraSalahAudio = document.getElementById("suaraSalah");
 
+let musikAktif = true;
+let musikSudahDimulai = false;
 
-const suaraBenarAudio =
-    document.getElementById(
-        "suaraBenar"
-    );
-
-
-const suaraSalahAudio =
-    document.getElementById(
-        "suaraSalah"
-    );
-
-
-/* Volume background */
-
+// Pengaturan volume musik
 if (backgroundMusic) {
-
     backgroundMusic.volume = 0.25;
-
 }
 
-
-/* =====================================================
-   MULAI BACKGROUND MUSIC
-===================================================== */
-
+// Memulai musik setelah interaksi pengguna
 function mulaiMusik() {
-
-    if (!musikAktif) return;
-
-    if (!backgroundMusic) return;
-
+    if (!backgroundMusic || !musikAktif) return;
 
     backgroundMusic.volume = 0.25;
-
 
     backgroundMusic.play()
-        .catch(function() {
-
-            console.log(
-                "Musik menunggu interaksi pengguna."
-            );
-
+        .then(() => {
+            musikSudahDimulai = true;
+        })
+        .catch((error) => {
+            console.warn("Musik belum dapat diputar:", error);
         });
-
 }
 
+// Memainkan suara jawaban
+function mainkanAudio(audio) {
+    if (!audio) return;
 
-/* =====================================================
-   SUARA JAWABAN BENAR
-===================================================== */
+    audio.pause();
+    audio.currentTime = 0;
+    audio.volume = 0.8;
 
+    audio.play().catch((error) => {
+        console.warn("Audio tidak dapat diputar:", error);
+    });
+}
+
+// Suara jawaban benar
 function mainkanSuaraBenar() {
-
-    if (!musikAktif) return;
-
-    if (!suaraBenarAudio) return;
-
-
-    suaraBenarAudio.currentTime = 0;
-
-    suaraBenarAudio.volume = 0.8;
-
-
-    suaraBenarAudio.play()
-        .catch(function() {
-
-            console.log(
-                "Suara benar tidak dapat dimainkan."
-            );
-
-        });
-
+    mainkanAudio(suaraBenarAudio);
 }
 
-
-/* =====================================================
-   SUARA JAWABAN SALAH
-===================================================== */
-
+// Suara jawaban salah
 function mainkanSuaraSalah() {
-
-    if (!musikAktif) return;
-
-    if (!suaraSalahAudio) return;
-
-
-    suaraSalahAudio.currentTime = 0;
-
-    suaraSalahAudio.volume = 0.8;
-
-
-    suaraSalahAudio.play()
-        .catch(function() {
-
-            console.log(
-                "Suara salah tidak dapat dimainkan."
-            );
-
-        });
-
+    mainkanAudio(suaraSalahAudio);
 }
 
-
-/* =====================================================
-   TOGGLE MUSIK
-===================================================== */
-
+// Tombol untuk menghidupkan atau mematikan musik
 function toggleMusic() {
-
     if (!backgroundMusic) return;
 
-
-    const tombol =
-        document.querySelector(
-            ".music-btn"
-        );
-
+    const tombol = document.querySelector(".music-btn");
 
     if (musikAktif) {
-
         backgroundMusic.pause();
-
         musikAktif = false;
 
-
-        if (tombol) {
-
-            tombol.innerText = "🔇";
-
-        }
-
-    }
-
-    else {
-
+        if (tombol) tombol.innerText = "🔇";
+    } else {
         musikAktif = true;
-
-
-        backgroundMusic.volume =
-            0.25;
-
-
-        backgroundMusic.play()
-            .catch(function() {});
-
-
-        if (tombol) {
-
-            tombol.innerText = "🔊";
-
-        }
-
-    }
-
-}
-
-
-/* =====================================================
-   MEMULAI MUSIK SETELAH KLIK PERTAMA
-===================================================== */
-
-document.addEventListener(
-    "click",
-    function mulaiMusikPertama() {
-
         mulaiMusik();
 
-    },
-    {
-        once: true
+        if (tombol) tombol.innerText = "🔊";
     }
-);
+}
+
+// Browser biasanya mengharuskan pengguna berinteraksi
+// terlebih dahulu sebelum musik otomatis diputar.
+document.addEventListener("click", function mulaiMusikPertama() {
+    if (!musikSudahDimulai && musikAktif) {
+        mulaiMusik();
+    }
+}, { once: true });
 
 
 /* =====================================================
