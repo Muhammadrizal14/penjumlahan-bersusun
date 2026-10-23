@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Misi Penjumlahan</title>
+
+    <link rel="stylesheet" href="./style.css">
+
+<style id="fitur-susun-css">
+.susun-info{max-width:650px;margin:10px auto;padding:12px 16px;background:#fff;border:2px solid #dbeafe;border-radius:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:14px}
+.nilai-tempat{max-width:500px;margin:18px auto;display:grid;grid-template-columns:130px 1fr 1fr;gap:8px;align-items:center}
+.kolom-label{text-align:center;font-weight:800;font-size:13px;color:#31506b}
+.baris-label{text-align:right;font-weight:700;color:#506070;padding-right:8px}
+.drop-slot{min-height:62px;border:3px dashed #b8c7d9;border-radius:14px;background:#f8fbff;font-size:32px;font-weight:900;color:#17324d;cursor:pointer;touch-action:none;transition:.15s}
+.drop-slot.drag-over{border-color:#2563eb;background:#eaf2ff;transform:scale(1.03)}
+.drop-slot.filled{border-style:solid;background:#fff}
+.drop-slot.correct{border-color:#22a06b;background:#ecfdf3}
+.drop-slot.wrong{border-color:#e45757;background:#fff1f1;animation:shake .25s linear}
+.bank-angka{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:15px auto}
+.angka-drag{width:58px;height:58px;border:2px solid #cbd5e1;border-radius:15px;background:#fff;font-size:28px;font-weight:900;cursor:grab;touch-action:none;box-shadow:0 3px 8px #0001}
+.angka-drag:active{cursor:grabbing;transform:scale(.96)}
+.angka-drag.used{opacity:.3;pointer-events:none}
+.susun-instruksi{text-align:center;max-width:680px;margin:12px auto;color:#536578;font-weight:600}
+.susun-feedback{max-width:680px;margin:14px auto;padding:14px 16px;border-radius:14px;background:#fff;border:2px solid #dbe3ee;text-align:center;min-height:24px;font-weight:700}
+.susun-feedback.ok{background:#ecfdf3;border-color:#9ad9bc;color:#17633e}.susun-feedback.warn{background:#fff7ed;border-color:#fed7aa;color:#8a4b08}.susun-feedback.bad{background:#fff1f1;border-color:#f5b0b0;color:#9b2525}
+.simpan-area{max-width:320px;margin:15px auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}.simpan-slot{min-height:58px}.lima{min-height:58px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;border:3px solid #9ad9bc;border-radius:14px;background:#ecfdf3}.angka-simpan-panel{max-width:650px;margin:18px auto;padding:16px;border:2px solid #fed7aa;background:#fffaf2;border-radius:18px;text-align:center}.simpan-title{font-weight:900;font-size:18px}.simpan-bank{margin-bottom:4px}.susun-actions{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}.susun-hitung{max-width:500px;margin:18px auto;padding:18px;background:#fff;border:2px solid #dbeafe;border-radius:18px;text-align:center}.susun-hitung .operasi{font-size:36px;font-weight:900;line-height:1.25;margin:12px}.susun-hitung input{width:150px;max-width:100%;font-size:30px;text-align:center;border:3px solid #cbd5e1;border-radius:14px;padding:8px}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media(max-width:600px){.nilai-tempat{grid-template-columns:92px 1fr 1fr}.baris-label{font-size:13px}.drop-slot{min-height:54px}.angka-drag{width:52px;height:52px}}
+</style>
+
+<style id="kotret-susun-style">
+.kotret-card{max-width:560px;margin:16px auto;padding:18px;background:rgba(255,255,255,.97);border:3px solid #dbeafe;border-radius:20px;box-shadow:0 5px 14px #0001}.kotret-label{text-align:center;font-size:19px;font-weight:900;margin-bottom:12px}.kotret-grid{display:grid;grid-template-columns:55px 1fr 1fr;gap:7px;max-width:330px;margin:auto}.kolom-label{font-size:12px;font-weight:900;text-align:center;color:#60748a}.baris-label{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900}.kotret-input{width:100%;height:58px;box-sizing:border-box;text-align:center;font-size:32px;font-weight:900;border:3px dashed #aab8c8;border-radius:12px;background:#fff;outline:none}.kotret-input:focus{border-style:solid;border-color:#4f8cff;box-shadow:0 0 0 4px #4f8cff22}.kotret-input.input-benar{border-color:#22a06b;background:#ecfdf3}.kotret-input.input-salah{border-color:#e45757;background:#fff1f1;animation:shake .25s linear}.kotret-input.input-locked{cursor:not-allowed}.garis-hasil{height:4px;background:#334155;border-radius:4px}.contoh-kecil{text-align:center;color:#536578;font-weight:600;margin:12px 0 0}.mini-operasi{text-align:center;font-size:25px;font-weight:900;margin:8px}.jawaban-digit{width:82px;display:inline-block;vertical-align:middle}.akhir-operasi{margin-top:18px}.simpan-kotret-grid{display:grid;grid-template-columns:55px 1fr 1fr;gap:7px;max-width:330px;margin:auto}.carry-slot,.hasil-satuan{height:58px;border:3px dashed #f0a34b;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;background:#fffaf2}.hasil-satuan{border-color:#22a06b;background:#ecfdf3}.carry-slot.drag-over{transform:scale(1.04);background:#fff1d8}.carry-slot.carry-benar{border-style:solid;border-color:#22a06b;background:#ecfdf3}.angka-drag{width:58px;height:58px;border:2px solid #cbd5e1;border-radius:15px;background:#fff;font-size:28px;font-weight:900;cursor:grab;touch-action:none;box-shadow:0 3px 8px #0001}.angka-drag.used{opacity:.35;cursor:not-allowed}.susun-info{max-width:560px;margin:10px auto;text-align:center;font-size:16px}.susun-feedback{max-width:650px;margin:14px auto;padding:14px 16px;border-radius:14px;background:#fff;border:2px solid #dbe3ee;text-align:center;min-height:24px;font-weight:700}.susun-feedback.ok{background:#ecfdf3;border-color:#9ad9bc;color:#17633e}.susun-feedback.bad{background:#fff1f1;border-color:#f5b0b0;color:#9b2525}.susun-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:16px}.bank-angka{display:flex;justify-content:center;margin:10px}.hidden{display:none!important}@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="topbar">
+
+        <div class="profil">
+            <div class="avatar">🧒</div>
+
+            <div>
+                <strong>Petualang</strong>
+                <div class="bintang">
+                    ⭐ <span id="bintangGlobal">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="judul-mini">
+            🧮 Misi Penjumlahan
+        </div>
+
+        <button class="music-btn" onclick="toggleMusic()">
+            🔊
+        </button>
+
+    </header>
+
+
+    <!-- ================= DUNIA ================= -->
+
+    <div class="dunia">
+
+        <div class="matahari">☀️</div>
+
+        <div class="awan awan1">☁️</div>
+        <div class="awan awan2">☁️</div>
+        <div class="awan awan3">☁️</div>
+
+        <div class="pohon pohon1">🌳</div>
+        <div class="pohon pohon2">🌴</div>
+
+        <div class="rumput">
+            🌼 🌿 🌷 🌿 🌼 🌿 🌷 🌿 🌼
+        </div>
+
+        <!-- ================= MENU ================= -->
+
+        <main id="menu" class="halaman">
+
+            <div class="karakter utama">
+                🧒
+            </div>
+
+            <h1>MISI<br> PENJUMLAHAN</h1>
+
+            <p class="subjudul">
+                🌟 Petualangan Belajar Matematika 🌟
+            </p>
+
+            <div class="menu-buttons">
+
+                <button class="btn hijau" onclick="mulaiBelajar()">
+                    📖
+                    <span>Mulai Belajar</span>
+                </button>
+
+                <button class="btn biru" onclick="pilihLevel()">
+                    🎯
+                    <span>Misi Penjumlahan</span>
+                </button>
+
+                <button class="btn ungu" onclick="lihatSkor()">
+                    🏆
+                    <span>Skor Saya</span>
+                </button>
+
+                <button class="btn jingga" onclick="petunjuk()">
+                    💡
+                    <span>Petunjuk</span>
+                </button>
+                <button class="btn merah" onclick="bukaTangkapAngka()">
+                    🎮
+                    <span>Tangkap Angka</span>
+                </button>
+                <button class="btn biru" onclick="bukaSusunPenjumlahan()">
+                    🧩
+                    <span>Susun Penjumlahan</span>
+                </button>
+
+            </div>
+
+            <div class="hewan">
+                🐰
+            </div>
+
+        </main>
+
+
+        <!-- ================= BELAJAR ================= -->
+
+        <section id="belajar" class="halaman hidden">
+
+            <div class="judul-papan">
+                📖 CARA MENJUMLAHKAN
+            </div>
+
+            <div class="pendamping">
+                🦉
+                <span>Perhatikan caranya ya!</span>
+            </div>
+
+            <p>Contoh penjumlahan:</p>
+
+            <div class="contoh-belajar">
+
+                <div class="angka-simpan-belajar" id="simpanBelajar">
+                    1
+                </div>
+
+                <div class="baris">
+                    <span></span>
+                    <span>2</span>
+                    <span>7</span>
+                </div>
+
+                <div class="baris">
+                    <span>+</span>
+                    <span>1</span>
+                    <span>8</span>
+                </div>
+
+                <div class="garis"></div>
+
+                <div class="baris hasil">
+                    <span></span>
+                    <span>4</span>
+                    <span>5</span>
+                </div>
+
+            </div>
+
+            <div class="langkah-container">
+
+                <div class="langkah satu">
+                    <b>1️⃣ Satuan</b>
+                    <p>7 + 8 = 15</p>
+                    <small>Tulis 5, simpan 1.</small>
+                </div>
+
+                <div class="langkah dua">
+                    <b>2️⃣ Puluhan</b>
+                    <p>2 + 1 + 1 = 4</p>
+                    <small>Jangan lupa angka simpan!</small>
+                </div>
+
+                <div class="langkah tiga">
+                    <b>3️⃣ Hasil</b>
+                    <p>27 + 18 = 45</p>
+                    <small>Hebat! 🎉</small>
+                </div>
+
+            </div>
+
+            <button class="btn besar hijau" onclick="pilihLevel()">
+                🎯 Coba Misi
+            </button>
+
+            <button class="btn kecil" onclick="kembaliMenu()">
+                🏠 Menu
+            </button>
+
+        </section>
+
+
+        <!-- ================= LEVEL ================= -->
+
+        <section id="level" class="halaman hidden">
+
+            <div class="judul-papan">
+                🎯 PILIH MISI
+            </div>
+
+            <div class="pendamping">
+                🐱
+                <span>Pilih petualanganmu!</span>
+            </div>
+
+            <div class="level-container">
+
+                <button class="level-card level1" onclick="mulaiLevel(1)">
+
+                    <div class="level-icon">
+                        🌱
+                    </div>
+
+                    <h2>Misi 1</h2>
+
+                    <p>Tanpa Menyimpan</p>
+
+                    <div class="peti">
+                        ⭐
+                    </div>
+
+                </button>
+
+
+                <button class="level-card level2" onclick="mulaiLevel(2)">
+
+                    <div class="level-icon">
+                        🚀
+                    </div>
+
+                    <h2>Misi 2</h2>
+
+                    <p>Dengan Menyimpan</p>
+
+                    <div class="peti">
+                        ⭐⭐
+                    </div>
+
+                </button>
+
+
+                <button class="level-card level3" onclick="mulaiLevel(3)">
+
+                    <div class="level-icon">
+                        🏆
+                    </div>
+
+                    <h2>Misi 3</h2>
+
+                    <p>Tantangan</p>
+
+                    <div class="peti">
+                        ⭐⭐⭐
+                    </div>
+
+                </button>
+
+            </div>
+
+            <button class="btn kecil" onclick="kembaliMenu()">
+                🏠 Menu
+            </button>
+
+        </section>
+
+
+        <!-- ================= PERMAINAN ================= -->
+
+        <section id="permainan" class="halaman hidden">
+
+            <div class="game-header">
+
+                <div class="misi-label" id="levelText">
+                    Misi 1
+                </div>
+
+                <div class="progress">
+                    <span id="nomorSoal">Soal 1 dari 5</span>
+                </div>
+
+                <div class="score">
+                    ⭐ <span id="skor">0</span>
+                </div>
+
+            </div>
+
+
+            <div class="karakter-game">
+                🐰
+                <div class="balon">
+                    <span id="pesanKarakter">
+                        Yuk, hitung mulai dari satuan!
+                    </span>
+                </div>
+            </div>
+
+
+            <!-- SOAL -->
+
+            <div class="kertas-soal">
+
+                <div class="angka-simpan" id="angkaSimpan"></div>
+
+                <div class="baris">
+                    <span></span>
+                    <span id="puluhan1">2</span>
+                    <span id="satuan1">7</span>
+                </div>
+
+                <div class="baris">
+                    <span>+</span>
+                    <span id="puluhan2">1</span>
+                    <span id="satuan2">8</span>
+                </div>
+
+                <div class="garis"></div>
+
+                <div class="baris hasil-question">
+                    <span></span>
+                    <span>?</span>
+                    <span>?</span>
+                </div>
+
+            </div>
+
+
+            <div class="instruksi">
+                ✏️ Tuliskan hasil penjumlahannya
+            </div>
+
+            <input
+                type="number"
+                id="jawaban"
+                placeholder="?"
+                onkeydown="tekanEnter(event)"
+            >
+
+            <button class="btn jawab" onclick="periksaJawaban()">
+                ✅ JAWAB
+            </button>
+
+            <div id="feedbackBox" class="feedback-box">
+    <div id="feedbackIcon">💡</div>
+
+    <div>
+        <strong id="feedbackTitle">Ayo Berhitung!</strong>
+        <p id="feedback"></p>
+    </div>
+</div>
+
+        </section>
+
+
+        
+        <!-- ================= GAME TAMBAHAN: TANGKAP ANGKA ================= -->
+        <section id="gameTangkapAngka" class="halaman hidden">
+            <div class="game-header">
+                <button class="btn kecil" onclick="kembaliDariTangkap()">🏠</button>
+                <div class="misi-label">🎮 Tangkap Angka</div>
+                <div class="score">⭐ <span id="skorTangkap">0</span></div>
+            </div>
+
+            <div class="info-tangkap">
+                <span>❤️ <b id="nyawaTangkap">3</b></span>
+                <span>Soal <b id="nomorTangkap">1</b>/5</span>
+            </div>
+
+            <div class="pertanyaan-tangkap">
+                <p>🎯 Tangkap hasil penjumlahan yang benar!</p>
+                <div id="soalTangkap">23 + 14 = ?</div>
+            </div>
+
+            <div id="arenaTangkap">
+                <div class="awan-game awan-game-1">☁️</div>
+                <div class="awan-game awan-game-2">☁️</div>
+                <div class="pohon-game pohon-game-1">🌳</div>
+                <div class="pohon-game pohon-game-2">🌳</div>
+                <div id="angkaJatuh1" class="angka-jatuh"></div>
+                <div id="angkaJatuh2" class="angka-jatuh"></div>
+                <div id="angkaJatuh3" class="angka-jatuh"></div>
+                <div id="keranjangTangkap">🧺</div>
+            </div>
+
+            <div class="kontrol-tangkap">
+                <button onclick="gerakKeranjangTangkap('kiri')">⬅️</button>
+                <button onclick="gerakKeranjangTangkap('kanan')">➡️</button>
+            </div>
+
+            <p id="feedbackTangkap">Tekan Mulai Game untuk bermain!</p>
+
+            <button id="mulaiTangkapBtn" class="btn besar hijau" onclick="mulaiTangkapAngka()">
+                ▶️ Mulai Game
+            </button>
+
+            <button id="ulangTangkapBtn" class="btn besar biru hidden" onclick="mulaiTangkapAngka()">
+                🔄 Main Lagi
+            </button>
+        </section>
+
+
+        <!-- ================= FITUR BARU: SUSUN PENJUMLAHAN ================= -->
+        <section id="susunPenjumlahan" class="halaman hidden">
+            <div class="judul-papan">✏️ KOTRET PENJUMLAHAN</div>
+            <div class="pendamping">🐰 <span>Seret angka ke kotak seperti sedang menulis di buku kotak!</span></div>
+
+            <div class="susun-info">
+                <div><b>Soal:</b> <span id="soalSusun">27 + 18</span></div>
+                <div id="nomorSoalSusun" class="contoh-kecil">Soal 1</div>
+                <div id="susunLangkah">Langkah 1: Susun angka sesuai nilai tempat</div>
+            </div>
+
+            <div class="kotret-card">
+                <div class="kotret-label">1️⃣ Susun bilangan sesuai nilai tempat</div>
+                <div class="kotret-grid">
+                    <div class="kolom-label"></div><div class="kolom-label">PULUHAN</div><div class="kolom-label">SATUAN</div>
+                    <div class="baris-label"></div><div id="slotAT" class="drop-slot susun-slot" data-slot="aT">?</div><div id="slotAS" class="drop-slot susun-slot" data-slot="aS">?</div>
+                    <div class="baris-label">+</div><div id="slotBT" class="drop-slot susun-slot" data-slot="bT">?</div><div id="slotBS" class="drop-slot susun-slot" data-slot="bS">?</div>
+                    <div></div><div class="garis-hasil"></div><div class="garis-hasil"></div>
+                </div>
+                <div class="contoh-kecil">💡 Puluhan masuk kolom PULUHAN. Satuan masuk kolom SATUAN.</div>
+                <div id="bankSusun" class="bank-angka" aria-label="Pilihan angka"></div>
+            </div>
+
+            <div id="tahapSatuan" class="kotret-card hidden">
+                <div class="kotret-label">2️⃣ Hitung satuan</div>
+                <div class="mini-operasi"><span id="operasiSatuan">7 + 8 =</span> <input id="jawabanSatuan" class="kotret-input jawaban-digit" maxlength="2" inputmode="numeric" aria-label="Hasil satuan"></div>
+                <p class="contoh-kecil">Jika hasilnya lebih dari 9, jangan lupa ada angka yang disimpan.</p>
+            </div>
+
+            <div id="angkaSimpanPanel" class="kotret-card hidden">
+                <div class="kotret-label">3️⃣ Simpan angka di tempat yang benar</div>
+                <p><b><span id="teksSatuan">7 + 8 = 15</span></b>. Angka satuan ditulis di bawah, sedangkan angka simpan harus diletakkan di atas <b>PULUHAN</b>.</p>
+                <div class="simpan-kotret-grid">
+                    <div></div><div class="kolom-label">PULUHAN</div><div class="kolom-label">SATUAN</div>
+                    <div class="baris-label"></div><div id="slotSimpan" class="carry-slot" tabindex="0">?</div><div id="hasilSatuanTulis" class="hasil-satuan">?</div>
+                </div>
+                <p class="contoh-kecil">🎯 Seret angka simpan tepat di atas kolom PULUHAN.</p>
+                <div class="bank-angka simpan-bank"><button id="angkaSimpanDrag" class="angka-drag" draggable="true" data-digit="1" type="button">1</button></div>
+            </div>
+
+            <div id="tahapAkhir" class="kotret-card hidden">
+                <div class="kotret-label">4️⃣ Hitung puluhan dan tulis hasil</div>
+                <div class="mini-operasi"><span id="operasiPuluhan">1 + 2 + 1 =</span> <input id="jawabanPuluhan" class="kotret-input jawaban-digit" maxlength="1" inputmode="numeric" aria-label="Hasil puluhan"></div>
+                <div class="mini-operasi akhir-operasi">Jadi hasilnya = <input id="jawabanAkhir" class="kotret-input jawaban-digit" maxlength="2" inputmode="numeric" aria-label="Jawaban akhir"></div>
+            </div>
+
+            <div id="susunFeedback" class="susun-feedback" aria-live="polite">Ayo mulai! Seret angka ke kotak yang tepat.</div>
+            <div class="susun-actions">
+                <button class="btn kecil" onclick="resetSusunPenjumlahan()">🔄 Ulangi Soal</button>
+                <button id="soalBerikutnyaBtn" class="btn kecil hijau hidden" onclick="soalBerikutnya()">➡️ Soal Berikutnya</button>
+                <button class="btn kecil" onclick="kembaliMenu()">🏠 Menu</button>
+            </div>
+        </section>
+
+        <!-- ================= HASIL ================= -->
+
+        <section id="skorHalaman" class="halaman hidden">
+
+            <div class="hasil-karakter">
+                🧒 🎉 🐰
+            </div>
+
+            <div class="judul-papan">
+                🏆 HASIL MISI
+            </div>
+
+            <div class="bintang-besar" id="bintangHasil">
+                ⭐⭐⭐
+            </div>
+
+            <div class="hasil-box">
+
+                <div>
+                    Skor Kamu
+                </div>
+
+                <strong>
+                    <span id="totalBintang">0</span> / 5
+                </strong>
+
+                <p id="pesanSkor">
+                    Hebat!
+                </p>
+
+            </div>
+
+            <button class="btn besar hijau" onclick="pilihLevel()">
+                🔄 Misi Lagi
+            </button>
+
+            <button class="btn kecil" onclick="kembaliMenu()">
+                🏠 Menu Utama
+            </button>
+
+        </section>
+
+
+        <!-- ================= PETUNJUK ================= -->
+
+        <section id="petunjuk" class="halaman hidden">
+
+            <div class="judul-papan">
+                💡 PETUNJUK
+            </div>
+
+            <div class="petunjuk-box">
+
+                <p>🎯 Pilih salah satu misi.</p>
+
+                <p>👀 Perhatikan angka dengan teliti.</p>
+
+                <p>1️⃣ Hitung mulai dari satuan.</p>
+
+                <p>✏️ Jika hasil satuan lebih dari 9,
+                    simpan 1.</p>
+
+                <p>⭐ Jawaban benar mendapatkan bintang.</p>
+
+                <p>🏆 Kumpulkan sebanyak-banyaknya!</p>
+
+            </div>
+
+            <div class="pendamping besar">
+                🐰
+            </div>
+
+            <button class="btn kecil" onclick="kembaliMenu()">
+                🏠 Menu Utama
+            </button>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- KONFETI -->
+
+<div id="confetti"></div>
+
+<audio id="backgroundMusic" loop preload="auto">
+    <source src="audio/Backgorun musik.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="suaraBenar" preload="auto">
+    <source src="audio/benar.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="suaraSalah" preload="auto">
+    <source src="audio/salah.mp3" type="audio/mpeg">
+</audio>
+
+
+    
+<script id="fitur-susun-js">
+(function(){
+  const soalBank=[
+    {a:27,b:18},{a:34,b:29},{a:46,b:17},{a:58,b:26},{a:25,b:37},{a:67,b:18},{a:48,b:27},{a:36,b:28}
+  ];
+  const state={stage:'arrange',placed:{},carry:false,index:0,q:null};
+  const $=id=>document.getElementById(id);
+  const slots=()=>document.querySelectorAll('#susunPenjumlahan .susun-slot');
+  function playFeedbackSound(type){const audioId=type==='ok'?'suaraBenar':type==='bad'?'suaraSalah':null;if(!audioId)return;const audio=$(audioId);if(!audio)return;try{audio.currentTime=0;const p=audio.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+  function feedback(text,type=''){const el=$('susunFeedback');if(el){el.textContent=text;el.className='susun-feedback '+type;}if(type==='ok'||type==='bad')playFeedbackSound(type)}
+  function step(text){if($('susunLangkah'))$('susunLangkah').textContent=text}
+  function current(){return state.q}
+  function expected(){const q=current();return {aT:String(Math.floor(q.a/10)),aS:String(q.a%10),bT:String(Math.floor(q.b/10)),bS:String(q.b%10)}}
+  function correctSlot(slot,digit){slot.textContent=digit;slot.classList.remove('wrong');slot.classList.add('filled','correct');slot.setAttribute('data-filled','1')}
+  function allPlaced(){return Object.keys(expected()).every(k=>state.placed[k]);}
+  function makeBank(){
+    const bank=$('bankSusun');bank.innerHTML='';
+    const q=current();
+    [Math.floor(q.a/10),q.a%10,Math.floor(q.b/10),q.b%10].forEach((d,i)=>{
+      const b=document.createElement('button');b.className='angka-drag susun-digit';b.draggable=true;b.type='button';b.dataset.digit=String(d);b.dataset.index=String(i);b.textContent=d;bank.appendChild(b);
+    });
+  }
+  function wrongPlacement(slot,digit){
+    slot.classList.add('wrong');const target=slot.dataset.slot;const q=current();const e=expected();let hint='';
+    if(digit===e.aT && target!=='aT') hint=`Angka ${digit} adalah puluhan dari ${q.a}. Letakkan di kolom PULUHAN pada baris pertama.`;
+    else if(digit===e.aS && target!=='aS') hint=`Angka ${digit} adalah satuan dari ${q.a}. Letakkan di kolom SATUAN pada baris pertama.`;
+    else if(digit===e.bT && target!=='bT') hint=`Angka ${digit} adalah puluhan dari ${q.b}. Letakkan di kolom PULUHAN pada baris kedua.`;
+    else if(digit===e.bS && target!=='bS') hint=`Angka ${digit} adalah satuan dari ${q.b}. Letakkan di kolom SATUAN pada baris kedua.`;
+    else hint='Perhatikan kembali pasangan angka dan nilai tempatnya.';
+    feedback('💡 Belum tepat. '+hint,'bad');setTimeout(()=>slot.classList.remove('wrong'),450);
+  }
+  function placeDigit(slot,digit,button){
+    if(state.stage!=='arrange'||slot.getAttribute('data-filled')==='1'||button.disabled)return;
+    if(expected()[slot.dataset.slot]!==digit){wrongPlacement(slot,digit);return;}
+    correctSlot(slot,digit);state.placed[slot.dataset.slot]=button.dataset.index;button.classList.add('used');button.disabled=true;
+    feedback(`🎉 Tepat! Angka ${digit} berada di tempat yang benar.`,'ok');
+    if(allPlaced()){
+      state.stage='satuan';slots().forEach(s=>s.classList.add('input-locked'));$('tahapSatuan').classList.remove('hidden');
+      const q=current();$('operasiSatuan').textContent=`${q.a%10} + ${q.b%10} =`;
+      step('Langkah 2: Hitung satuan');feedback(`🌟 Susunan ${q.a} + ${q.b} sudah benar. Sekarang hitung satuannya.`,'ok');$('jawabanSatuan').focus();
+    }
+  }
+  function setupArrange(){
+    const bank=$('bankSusun');
+    bank.addEventListener('dragstart',e=>{const btn=e.target.closest('.susun-digit');if(!btn||state.stage!=='arrange'||btn.disabled){e.preventDefault();return}e.dataTransfer.setData('text/plain',btn.dataset.index);e.dataTransfer.effectAllowed='move'});
+    bank.addEventListener('click',e=>{const btn=e.target.closest('.susun-digit');if(btn&&!btn.disabled)feedback('👉 Seret angka '+btn.dataset.digit+' ke kotak yang sesuai.','')});
+    slots().forEach(slot=>{
+      slot.addEventListener('dragover',e=>{if(state.stage==='arrange'&&slot.getAttribute('data-filled')!=='1'){e.preventDefault();slot.classList.add('drag-over')}});
+      slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));
+      slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag-over');const idx=e.dataTransfer.getData('text/plain');const btn=bank.querySelector(`.susun-digit[data-index="${idx}"]`);if(btn)placeDigit(slot,btn.dataset.digit,btn)});
+    });
+  }
+  function cekSatuan(){
+    if(state.stage!=='satuan')return;const q=current(),el=$('jawabanSatuan'),v=el.value.trim(),sum=(q.a%10)+(q.b%10);
+    if(v===String(sum)){
+      el.classList.remove('input-salah');el.classList.add('input-benar');el.disabled=true;state.stage='carry';
+      const ones=sum%10,carry=Math.floor(sum/10);$('hasilSatuanTulis').textContent=ones;$('teksSatuan').textContent=`${q.a%10} + ${q.b%10} = ${sum}`;$('angkaSimpanDrag').dataset.digit=String(carry);$('angkaSimpanDrag').textContent=carry;
+      $('angkaSimpanPanel').classList.remove('hidden');step('Langkah 3: Simpan angka puluhan');feedback(`⭐ Benar! ${q.a%10} + ${q.b%10} = ${sum}. Angka ${carry} harus disimpan di atas kolom PULUHAN.`,'ok');
+    }else if(v) {el.classList.remove('input-benar');el.classList.add('input-salah');feedback(`💡 Coba lagi. Hitung ${q.a%10} + ${q.b%10}.`,'bad')}
+  }
+  function setupCarry(){
+    const btn=$('angkaSimpanDrag'),slot=$('slotSimpan');
+    const put=()=>{if(state.stage!=='carry')return;const q=current(),sum=(q.a%10)+(q.b%10),carry=Math.floor(sum/10);slot.textContent=carry;slot.classList.add('carry-benar');btn.classList.add('used');btn.disabled=true;state.carry=true;state.stage='final';
+      $('tahapAkhir').classList.remove('hidden');$('operasiPuluhan').textContent=`${carry} + ${Math.floor(q.a/10)} + ${Math.floor(q.b/10)} =`;step('Langkah 4: Hitung puluhan');feedback(`🎉 Tepat! Angka ${carry} ditempatkan di atas PULUHAN karena merupakan angka simpan.`,'ok');$('jawabanPuluhan').focus()};
+    btn.addEventListener('dragstart',e=>{if(state.stage!=='carry'||btn.disabled){e.preventDefault();return}e.dataTransfer.setData('text/plain',btn.dataset.digit)});
+    btn.addEventListener('click',()=>{if(state.stage==='carry')feedback('👉 Seret angka simpan ke kotak PULUHAN di atas bilangan.','')});
+    slot.addEventListener('dragover',e=>{if(state.stage==='carry'){e.preventDefault();slot.classList.add('drag-over')}});slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));
+    slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag-over');if(e.dataTransfer.getData('text/plain')===btn.dataset.digit)put();else feedback('💡 Seret angka simpan yang tersedia ke kolom PULUHAN.','bad')});
+  }
+  function cekPuluhan(){
+    if(state.stage!=='final')return;const q=current(),el=$('jawabanPuluhan'),v=el.value.trim(),sum=Math.floor(q.a/10)+Math.floor(q.b/10)+Math.floor((q.a%10+q.b%10)/10);
+    if(v===String(sum)){el.classList.remove('input-salah');el.classList.add('input-benar');el.disabled=true;feedback(`⭐ Benar! ${$('operasiPuluhan').textContent} ${sum}. Sekarang tuliskan hasil akhirnya.`,'ok');$('jawabanAkhir').focus()}
+    else if(v){el.classList.remove('input-benar');el.classList.add('input-salah');feedback(`💡 Perhatikan angka simpan. Hitung ${$('operasiPuluhan').textContent} ${sum}.`,'bad')}
+  }
+  function cekAkhir(){
+    if(state.stage!=='final'||!$('jawabanPuluhan').disabled)return;const q=current(),el=$('jawabanAkhir'),v=el.value.trim(),ans=q.a+q.b;
+    if(v===String(ans)){el.classList.remove('input-salah');el.classList.add('input-benar');el.disabled=true;state.stage='done';feedback(`🏆 Hebat! ${q.a} + ${q.b} = ${ans}. Kamu berhasil menyusun angka dan menempatkan angka simpan dengan tepat.`,'ok');$('soalBerikutnyaBtn').classList.remove('hidden')}
+    else if(v){el.classList.remove('input-benar');el.classList.add('input-salah');feedback(`💡 Belum tepat. Periksa lagi hasil satuan dan puluhannya. ${q.a} + ${q.b} = ...`,'bad')}
+  }
+  function loadQuestion(i){
+    state.index=(i+soalBank.length)%soalBank.length;state.q=soalBank[state.index];state.stage='arrange';state.placed={};state.carry=false;
+    const q=current();$('soalSusun').textContent=`${q.a} + ${q.b}`;$('nomorSoalSusun').textContent=`Soal ${state.index+1} dari ${soalBank.length}`;
+    slots().forEach(s=>{s.textContent='?';s.className='drop-slot susun-slot';s.removeAttribute('data-filled')});makeBank();
+    ['jawabanSatuan','jawabanPuluhan','jawabanAkhir'].forEach(id=>{const el=$(id);el.value='';el.disabled=false;el.className='kotret-input jawaban-digit'});
+    $('tahapSatuan').classList.add('hidden');$('angkaSimpanPanel').classList.add('hidden');$('tahapAkhir').classList.add('hidden');
+    $('slotSimpan').textContent='?';$('slotSimpan').className='carry-slot';const cb=$('angkaSimpanDrag');cb.classList.remove('used');cb.disabled=false;cb.textContent='1';cb.dataset.digit='1';
+    $('soalBerikutnyaBtn').classList.add('hidden');step('Langkah 1: Susun angka sesuai nilai tempat');feedback(`Ayo kerjakan ${q.a} + ${q.b}. Seret setiap angka ke tempat yang tepat.`);
+  }
+  function setup(){
+    setupArrange();
+    $('jawabanSatuan').addEventListener('input',()=>{$('jawabanSatuan').value=$('jawabanSatuan').value.replace(/\D/g,'').slice(0,2);cekSatuan()});
+    $('jawabanPuluhan').addEventListener('input',()=>{$('jawabanPuluhan').value=$('jawabanPuluhan').value.replace(/\D/g,'').slice(0,1);cekPuluhan()});
+    $('jawabanAkhir').addEventListener('input',()=>{$('jawabanAkhir').value=$('jawabanAkhir').value.replace(/\D/g,'').slice(0,2);cekAkhir()});setupCarry();loadQuestion(0);
+  }
+  window.bukaSusunPenjumlahan=function(){document.querySelectorAll('.halaman').forEach(x=>x.classList.add('hidden'));$('susunPenjumlahan').classList.remove('hidden');loadQuestion(0)};
+  window.resetSusunPenjumlahan=function(){loadQuestion(state.index)};
+  window.soalBerikutnya=function(){loadQuestion(state.index+1)};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup);else setup();
+})();
+</script>
+
+    <script src="./script.js"></script>
+</body>
+</html>
